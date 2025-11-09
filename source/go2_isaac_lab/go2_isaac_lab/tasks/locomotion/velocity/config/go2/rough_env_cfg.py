@@ -1,3 +1,4 @@
+import isaaclab.terrains as terrain_gen
 from go2_isaac_lab.assets.go2 import GO2_CFG
 from go2_isaac_lab.tasks.locomotion.velocity.go2_isaac_lab_env_cfg import (
     LocomotionVelocityRoughEnvCfg,
@@ -26,36 +27,39 @@ class Go2SceneCfg(MySceneCfg):
         self.terrain.terrain_generator.slope_threshold = 0.75
         self.terrain.terrain_generator.difficulty_range = (0.0, 1.0)
         self.terrain.terrain_generator.use_cache = False
-        self.terrain.terrain_generator.sub_terrains["random_rough"].noise_range = (0.01, 0.06)
-        self.terrain.terrain_generator.sub_terrains["random_rough"].noise_step = 0.01
-        self.terrain.terrain_generator.sub_terrains["random_rough"].border_width = 0.25
-        self.terrain.terrain_generator.sub_terrains["hf_pyramid_slope"].slope_range = (0.0, 0.4)
-        self.terrain.terrain_generator.sub_terrains["hf_pyramid_slope"].platform_width = 2.0
-        self.terrain.terrain_generator.sub_terrains["hf_pyramid_slope"].border_width = 0.25
-        self.terrain.terrain_generator.sub_terrains["hf_pyramid_slope_inv"].slope_range = (0.0, 0.4)
-        self.terrain.terrain_generator.sub_terrains["hf_pyramid_slope_inv"].platform_width = 2.0
-        self.terrain.terrain_generator.sub_terrains["hf_pyramid_slope_inv"].border_width = 0.25
-        self.terrain.terrain_generator.sub_terrains["boxes"].grid_width = 0.45
-        self.terrain.terrain_generator.sub_terrains["boxes"].grid_height_range = (0.05, 0.20)
-        self.terrain.terrain_generator.sub_terrains["boxes"].platform_width = 2.0
-        self.terrain.terrain_generator.sub_terrains["pyramid_stairs"].step_height_range = (0.05, 0.23)
-        self.terrain.terrain_generator.sub_terrains["pyramid_stairs"].step_width = 0.3
-        self.terrain.terrain_generator.sub_terrains["pyramid_stairs"].platform_width = 3.0
-        self.terrain.terrain_generator.sub_terrains["pyramid_stairs"].border_width = 1.0
-        self.terrain.terrain_generator.sub_terrains["pyramid_stairs"].holes = False
-        self.terrain.terrain_generator.sub_terrains["pyramid_stairs_inv"].step_height_range = (0.05, 0.23)
-        self.terrain.terrain_generator.sub_terrains["pyramid_stairs_inv"].step_width = 0.3
-        self.terrain.terrain_generator.sub_terrains["pyramid_stairs_inv"].platform_width = 3.0
-        self.terrain.terrain_generator.sub_terrains["pyramid_stairs_inv"].border_width = 1.0
-        self.terrain.terrain_generator.sub_terrains["pyramid_stairs_inv"].holes = False
-
-        # set the terrain proportions
-        self.terrain.terrain_generator.sub_terrains["random_rough"].proportion = 0.1
-        self.terrain.terrain_generator.sub_terrains["hf_pyramid_slope"].proportion = 0.1
-        self.terrain.terrain_generator.sub_terrains["hf_pyramid_slope_inv"].proportion = 0.1
-        self.terrain.terrain_generator.sub_terrains["boxes"].proportion = 0.2
-        self.terrain.terrain_generator.sub_terrains["pyramid_stairs"].proportion = 0.2
-        self.terrain.terrain_generator.sub_terrains["pyramid_stairs_inv"].proportion = 0.2
+        self.terrain.terrain_generator.sub_terrains["flat"].proportion = 0.1
+        self.terrain.terrain_generator.sub_terrains["random_rough"] = terrain_gen.HfRandomUniformTerrainCfg(
+            proportion=0.1, noise_range=(0.01, 0.06), noise_step=0.01, border_width=0.25
+        )
+        self.terrain.terrain_generator.sub_terrains["hf_pyramid_slope"] = terrain_gen.HfPyramidSlopedTerrainCfg(
+            proportion=0.1, slope_range=(0.0, 0.4), platform_width=2.0, border_width=0.25
+        )
+        self.terrain.terrain_generator.sub_terrains["hf_pyramid_slope_inv"] = (
+            terrain_gen.HfInvertedPyramidSlopedTerrainCfg(
+                proportion=0.1, slope_range=(0.0, 0.4), platform_width=2.0, border_width=0.25
+            )
+        )
+        self.terrain.terrain_generator.sub_terrains["boxes"] = terrain_gen.MeshRandomGridTerrainCfg(
+            proportion=0.2, grid_width=0.45, grid_height_range=(0.05, 0.2), platform_width=2.0
+        )
+        self.terrain.terrain_generator.sub_terrains["pyramid_stairs"] = terrain_gen.MeshPyramidStairsTerrainCfg(
+            proportion=0.2,
+            step_height_range=(0.05, 0.23),
+            step_width=0.3,
+            platform_width=3.0,
+            border_width=1.0,
+            holes=False,
+        )
+        self.terrain.terrain_generator.sub_terrains["pyramid_stairs_inv"] = (
+            terrain_gen.MeshInvertedPyramidStairsTerrainCfg(
+                proportion=0.2,
+                step_height_range=(0.05, 0.23),
+                step_width=0.3,
+                platform_width=3.0,
+                border_width=1.0,
+                holes=False,
+            )
+        )
 
 
 @configclass
