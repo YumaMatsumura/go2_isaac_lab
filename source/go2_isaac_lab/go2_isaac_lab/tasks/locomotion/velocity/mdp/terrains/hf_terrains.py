@@ -1,21 +1,16 @@
-from dataclasses import MISSING
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import numpy as np
-from isaaclab.terrains.height_field import HfTerrainBaseCfg
 from isaaclab.terrains.height_field.utils import height_field_to_mesh
-from isaaclab.utils import configclass
 
-
-# ===== Climbing down =====
-@configclass
-class ClimbDownTerrainCfg(HfTerrainBaseCfg):
-    function = None
-    box_height_range: tuple[float, float] = MISSING
-    edge_offset: float = MISSING  # 台の端までの長さ [m]
+if TYPE_CHECKING:
+    from . import hf_terrains_cfg
 
 
 @height_field_to_mesh
-def hf_climb_down(difficulty: float, cfg: ClimbDownTerrainCfg) -> np.ndarray:
+def hf_climb_down(difficulty: float, cfg: hf_terrains_cfg.ClimbDownTerrainCfg) -> np.ndarray:
     min_height, max_height = cfg.box_height_range
     box_height = min_height + difficulty * (max_height - min_height)
 
