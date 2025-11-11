@@ -5,7 +5,7 @@
 
 import gymnasium as gym
 
-from . import agents, rough_env_cfg
+from . import agents, parkour_env_cfg, rough_env_cfg
 
 ##
 # Register Gym environments.
@@ -18,6 +18,17 @@ gym.register(
     kwargs={
         "env_cfg_entry_point": rough_env_cfg.Go2RoughEnvCfg,
         "play_env_cfg_entry_point": rough_env_cfg.Go2RoughEnvCfg_PLAY,
+        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:Go2RoughPPORunnerCfg",
+    },
+)
+
+gym.register(
+    id="Go2-Isaac-Lab-Velocity-Parkour-ClimbDown-v0",
+    entry_point="isaaclab.envs:ManagerBasedRLEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": parkour_env_cfg.Go2ParkourEnvCfg,
+        "play_env_cfg_entry_point": parkour_env_cfg.Go2ParkourEnvCfg_PLAY,
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:Go2RoughPPORunnerCfg",
     },
 )
