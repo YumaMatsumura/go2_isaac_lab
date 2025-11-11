@@ -9,5 +9,12 @@ from . import hf_terrains
 @configclass
 class ClimbDownTerrainCfg(HfTerrainBaseCfg):
     function = hf_terrains.hf_climb_down
-    box_height_range: tuple[float, float] = MISSING
-    edge_offset: float = MISSING  # 台の端までの長さ [m]
+    box_height_range: tuple[float, float] = MISSING  # 段差高さの範囲 [m]
+    box_edge: float = MISSING  # 台の1辺の長さ [m]
+
+
+@configclass
+class ClimbUpTerrainCfg(HfTerrainBaseCfg):
+    function = hf_terrains.hf_climb_down
+    box_height_range: tuple[float, float] = MISSING  # 段差高さの範囲 [m]
+    box_edge: float = MISSING  # 台の1辺の長さ [m]
