@@ -4,4 +4,5 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 
-from .hf_terrains_cfg import ClimbDownTerrainCfg
+from .hf_terrains_cfg import ClimbDownTerrainCfg, SquarePitPowerTerrainCfg
+from .mesh_terrains_cfg import CrouchTerrainCfg

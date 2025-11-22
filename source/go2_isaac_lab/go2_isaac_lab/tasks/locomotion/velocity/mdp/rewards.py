@@ -78,6 +78,15 @@ def joint_position_penalty(
     return torch.where(torch.logical_or(cmd > 0.0, body_vel > velocity_threshold), reward, stand_still_scale * reward)
 
 
+def crouch_base_height(
+    env: ManagerBasedRLEnv, target_height: float = 0.25, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
+) -> torch.Tensor:
+    """目標より高いとペナルティ、低すぎてもペナルティ"""
+    asset: Articulation = env.scene[asset_cfg.name]
+    base_height = asset.data.root_pos_w[:, 2]
+    return -torch.square(base_height - target_height)
+
+
 """
 Feet rewards.
 """
@@ -200,6 +209,55 @@ def feet_gait(
         cmd_norm = torch.norm(env.command_manager.get_command(command_name), dim=1)
         reward *= cmd_norm > 0.1
     return reward
+
+
+"""
+Virtual Track rewards.
+"""
+
+
+def virtual_climb_track_penalty(
+    env: ManagerBasedRLEnv,
+    wall_offset_x: float,
+    wall_offset_y: float,
+    length: float,
+    height: float,
+    thickness: float,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+) -> torch.Tensor:
+    device = env.device
+
+    # 各envの原点
+    terrain = env.scene.terrain
+    env_origins = terrain.env_origins
+
+    # ロボットのroot位置
+    robot = env.scene[asset_cfg.name]
+    base_pos_w = robot.data.root_state_w[:, 0:3]
+
+    # 各envに対応する仮想壁の中心座標を計算
+    wall_center = torch.empty_like(base_pos_w)
+    wall_center[:, 0] = env_origins[:, 0] + wall_offset_x
+    wall_center[:, 1] = env_origins[:, 1] + wall_offset_y
+    wall_center[:, 2] = env_origins[:, 2] + 0.5 * height
+
+    # 直方体の半サイズ
+    half_extents = torch.tensor(
+        [0.5 * thickness, 0.5 * length, 0.5 * height],
+        device=device,
+        dtype=base_pos_w.dtype,
+    )
+
+    # ロボット位置を壁中心基準のローカル座標に変換
+    rel_pos = base_pos_w - wall_center
+
+    # 仮想壁との衝突判定
+    in_margin = half_extents - torch.abs(rel_pos)
+    min_margin, _ = torch.min(in_margin, dim=-1)
+
+    penetration_depth = torch.clamp(min_margin, min=0.0)
+
+    return penetration_depth
 
 
 """
