@@ -3,5 +3,4 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-from .pose import *  # noqa
 from .velocity import *  # noqa
