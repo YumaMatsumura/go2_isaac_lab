@@ -67,3 +67,7 @@ pip install -e source/go2_isaac_lab/
 ### 転倒復帰の最新のポリシー
 
 - `/home/yuma/go2_isaac_lab/logs/rsl_rl/go2_parkour/2025-11-19_08-33-56`
+
+### しゃがみ歩行の最新のポリシー
+
+- `/home/yuma/go2_isaac_lab/logs/rsl_rl/go2_parkour/2025-11-28_22-45-36`

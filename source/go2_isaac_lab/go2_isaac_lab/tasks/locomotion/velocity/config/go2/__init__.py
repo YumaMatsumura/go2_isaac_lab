@@ -5,7 +5,7 @@
 
 import gymnasium as gym
 
-from . import agents, parkour_env_cfg, rough_env_cfg
+from . import agents, parkour_crouch_env_cfg, parkour_env_cfg, rough_env_cfg
 
 ##
 # Register Gym environments.
@@ -38,8 +38,8 @@ gym.register(
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
-        "env_cfg_entry_point": parkour_env_cfg.Go2ParkourCrouchEnvCfg,
-        "play_env_cfg_entry_point": parkour_env_cfg.Go2ParkourCrouchEnvCfg_PLAY,
+        "env_cfg_entry_point": parkour_crouch_env_cfg.Go2ParkourCrouchEnvCfg,
+        "play_env_cfg_entry_point": parkour_crouch_env_cfg.Go2ParkourCrouchEnvCfg_PLAY,
         "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:Go2ParkourPPORunnerWithSymmetryCfg",
     },
 )

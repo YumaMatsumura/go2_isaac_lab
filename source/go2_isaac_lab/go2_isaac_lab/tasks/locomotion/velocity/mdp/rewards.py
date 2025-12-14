@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING
 
 import torch
@@ -78,13 +79,64 @@ def joint_position_penalty(
     return torch.where(torch.logical_or(cmd > 0.0, body_vel > velocity_threshold), reward, stand_still_scale * reward)
 
 
-def crouch_base_height(
-    env: ManagerBasedRLEnv, target_height: float = 0.25, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
+def crouch_joint_posture(
+    env: ManagerBasedRLEnv,
+    asset_cfg: SceneEntityCfg,
+    targets: dict[str, float],
+    stand_still_scale: float = 1.0,
+    velocity_threshold: float = 0.3,
 ) -> torch.Tensor:
-    """目標より高いとペナルティ、低すぎてもペナルティ"""
+    """しゃがみ用の関節姿勢正則化"""
+    asset: Articulation = env.scene[asset_cfg.name]
+
+    joint_names = list(asset.data.joint_names)
+
+    # 速度・コマンド量
+    cmd = torch.linalg.norm(env.command_manager.get_command("base_velocity"), dim=1)
+    body_vel = torch.linalg.norm(asset.data.root_lin_vel_b[:, :2], dim=1)
+
+    total = torch.zeros(env.num_envs, device=env.device)
+
+    for pattern, target in targets.items():
+        regex = re.compile(pattern)
+
+        # 正規表現でマッチする joint のインデックスを列挙
+        indices = [i for i, name in enumerate(joint_names) if regex.fullmatch(name)]
+        if len(indices) == 0:
+            continue  # そのパターンにマッチするjointがなければスキップ
+
+        # (num_envs, n_joints)
+        joint_pos = asset.data.joint_pos[:, indices]
+        # target はスカラなので自動ブロードキャストされる
+        diff = joint_pos - target
+        total += torch.linalg.norm(diff, dim=1)
+
+    # 止まっているときは正則化を強める
+    scale = torch.where(
+        torch.logical_or(cmd > 0.0, body_vel > velocity_threshold),
+        torch.ones_like(cmd),
+        stand_still_scale * torch.ones_like(cmd),
+    )
+
+    return total * scale
+
+
+def crouch_base_height(
+    env: ManagerBasedRLEnv,
+    target_height: float = 0.25,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+    higher_scale: float = 5.0,
+    lower_scale: float = 1.0,
+) -> torch.Tensor:
+    """目標より高いと強いペナルティ、低すぎてもペナルティ"""
     asset: Articulation = env.scene[asset_cfg.name]
     base_height = asset.data.root_pos_w[:, 2]
-    return -torch.square(base_height - target_height)
+    diff = base_height - target_height
+
+    higher = torch.clamp(diff, min=0.0)
+    lower = torch.clamp(-diff, min=0.0)
+
+    return -(higher_scale * higher**2 + lower_scale * lower**2)
 
 
 """
