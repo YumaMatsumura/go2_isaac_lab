@@ -71,3 +71,8 @@ pip install -e source/go2_isaac_lab/
 ### しゃがみ歩行の最新のポリシー
 
 - `/home/yuma/go2_isaac_lab/logs/rsl_rl/go2_parkour/2025-11-28_22-45-36`
+
+### 不整地歩行の最新のポリシー
+
+- `/home/yuma/go2_isaac_lab/logs/rsl_rl/go2_parkour/2025-12-14_22-39-35`
+- `model_49999.pt`

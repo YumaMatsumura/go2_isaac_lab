@@ -5,4 +5,4 @@
 
 
 from .hf_terrains_cfg import ClimbDownTerrainCfg, SquarePitPowerTerrainCfg
-from .mesh_terrains_cfg import CrouchTerrainCfg
+from .mesh_terrains_cfg import CrouchTerrainCfg, ScatteredPipesTerrainCfg
