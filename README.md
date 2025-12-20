@@ -53,6 +53,20 @@ pip install -e source/go2_isaac_lab/
      --checkpoint model_15000.pt
    ```
 
+- ポリシーを再生する（onnx生成）
+
+   ```bash
+   python scripts/rsl_rl/play.py --task <TASK_NAME> --checkpoint <PT_FILE>
+   ```
+
+   以下に例を示す
+   ```bash
+   python scripts/rsl_rl/play.py \
+     --task Go2-Isaac-Lab-Velocity-Parkour-Walk-v0 \
+     --checkpoint logs/rsl_rl/go2_parkour/2025-12-14_22-39-35/model_49999.pt
+   ```
+
+
 ## 開発者用
 
 - `pre-commit`の導入
